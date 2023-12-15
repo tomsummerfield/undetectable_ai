@@ -94,7 +94,6 @@ class DataCleaner:
 
         df.to_csv(json_file, index=False)
 
-
 class GPTResponse:
     def __init__(self, client: any) -> None:
         self.client = client        
