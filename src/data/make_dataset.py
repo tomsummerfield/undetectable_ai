@@ -4,70 +4,36 @@ import matplotlib.pyplot as plt
 import os
 from openai import OpenAI
 from datasets import load_dataset
+import string
 
 
 class DataCleaner:
-    
+
     def __init__(self) -> None:
-        return
-    
-    def merge_dataset(self, json_files: list):
-        glb_df = pd.DataFrame()
-
-        if json_files:
-            for json_file in json_files:
-                df = pd.read_json(json_file)
-                glb_df = pd.concat([glb_df, df])
-
-            glb_df.to_csv("./data/processed/QuestionAnswers.csv", mode="a")                    
-
-    def explore_dataset(self, json_file: str):
-        data_df = pd.read_json(json_file)
-        print("\n")
-        print("\n")
-        print(
-            f"The dataset contains {data_df.shape[0]} rows and {data_df.shape[1]} columns"
-        )
-        print(
-            "------------------------------------------------------------------------------"
-        )
-        print("\n")
-        print(f"The columns names are: {data_df.columns}")
-        print(
-            "------------------------------------------------------------------------------"
-        )
-        print("\n")
-        print(data_df.head())
-        print(
-            "------------------------------------------------------------------------------"
-        )
-        print("\n")
-        print(data_df.info())
-        print(
-            "------------------------------------------------------------------------------"
-        )
-        print("\n")
-        print(data_df.describe())
-        print("\n")
-        print("\n")
+        pass
 
     def clean_dataset(
         self,
-        json_file: str,
-        method_to_remove_and_from: list = [],
-        columns_to_be_removed: dict = {},
-        col_values_to_be_added: dict = {},        
-    ):
-        df = pd.read_json(json_file)
-
-        if method_to_remove_and_from:
-            position = method_to_remove_and_from[0]["Method"][1]
-            df.drop(df.iloc[:, position:], inplace=True, axis=1)
-
+        file_type: str,
+        file: str,
+        columns_to_be_removed: list = [],
+        col_values_to_be_added: dict = {},
+    ) -> pd.DataFrame() :
+        
+        df: pd.DataFrame() = pd.DataFrame()                        
+        
+        if file_type == "json":
+            df = pd.read_json(file)
+        elif file_type == "csv" or file_type == "text":
+            df = pd.read_csv(file, index_col=0)
+        else:
+            print("Unknown file type")
+            return
+     
         if columns_to_be_removed:
             for col in columns_to_be_removed:
                 try:
-                    df.drop(col, inplace=True, axis=1)
+                    df.drop(col, inplace=True, axis=1, index=None)                    
                 except Exception as error:
                     print("Error occured: ", error)
 
@@ -78,25 +44,51 @@ class DataCleaner:
                 except Exception as error:
                     print("Error occured: ", error)
 
-        # Update JSON file
-        df.to_json(self.json_file)
+        df['Response'] = df['Response'].str.lower()
+        df['Response'] = df['Response'].str.replace(f"[{string.punctuation}]", '', regex=True)
+        df['Response'] = df['Response'].str.replace('\d+', '', regex=True)
+        df['Response'] = df['Response'].str.replace('â€“', '', regex=False)
+        
+        return df
 
-    def rename_columns(self, json_file: str, columns_to_rename: dict):
-        df = pd.read_csv(json_file)
-        if columns_to_rename:
-            for col in columns_to_rename:
-                df.rename(
-                    columns={
-                        col: columns_to_rename[col],
-                    },
-                    inplace=True,
-                )
+class DataManager:
 
-        df.to_csv(json_file, index=False)
+    def __init__(self) -> None:
+        pass
+
+    def save_dataset(self, data: any, save_format: str, path: str) -> None: 
+        
+        df: any = pd.DataFrame(data)    
+        
+        if save_format == "json":
+            df.to_json(path)
+        elif save_format == "csv":
+            df.to_csv(path)
+        elif save_format == "text":
+            df.to_csv(path)
+        else:
+            print("Unkown")
+
+class DataSplitter:
+
+    def __init__(self) -> None:
+        pass
+
+    def split_dataset(
+        self, csv: str, features_column: list, prediction_columns: list
+    ) -> any:
+        df = pd.read_csv(csv)
+        train_size = int(len(df) * 0.8)
+        test_size = len(df) - train_size
+        x_train = df[features_column][:train_size]
+        y_train = df[prediction_columns][:train_size]
+        x_test = df[features_column][test_size:]
+        y_test = df[prediction_columns][test_size:]
+        return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
 class GPTResponse:
     def __init__(self, client: any) -> None:
-        self.client = client        
+        self.client = client
 
     # Method to retrieve GPT responses
     def return_gpt_response(self, question):
@@ -106,4 +98,3 @@ class GPTResponse:
             messages=[{"role": "user", "content": question}],
         )
         return chat_completion.choices[0].message.content
-
