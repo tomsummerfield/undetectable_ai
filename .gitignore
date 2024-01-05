@@ -2,5 +2,4 @@
 .env
 
 # exclude data from source control by default
-/data/
-
+/project_data
