@@ -1,10 +1,10 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='src',
+    name='Undectable_ai',  # Use a unique project name
     packages=find_packages(),
     version='0.1.0',
-    description='',
+    description='Project to detect AI generated text',
     author='Tom',
-    license='',
+    license='MIT',
 )

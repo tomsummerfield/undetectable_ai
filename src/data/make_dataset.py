@@ -5,7 +5,6 @@ import os
 import string
 import re
 
-
 class DataCleaner:
     def __init__(self) -> None:
         pass
@@ -51,7 +50,6 @@ class DataCleaner:
 
         return df
 
-
 class DataManager:
     def __init__(self) -> None:
         pass
@@ -68,7 +66,6 @@ class DataManager:
         else:
             print("Unkown")
 
-
 class DataSplitter:
     def __init__(self) -> None:
         pass
@@ -83,7 +80,6 @@ class DataSplitter:
         y_test = df[target][test_size:]
         return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
-
 class GPTResponse:
     def __init__(self, client: any) -> None:
         self.client = client
@@ -96,7 +92,6 @@ class GPTResponse:
             messages=[{"role": "user", "content": question}],
         )
         return chat_completion.choices[0].message.content
-
 
 class DataCorpusEncoderManager:
     def __init__(self) -> None:
