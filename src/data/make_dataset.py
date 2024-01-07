@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 import string
 import re
+from keras.preprocessing.sequence import pad_sequences
+
 
 class DataCleaner:
     def __init__(self) -> None:
@@ -70,14 +71,14 @@ class DataSplitter:
     def __init__(self) -> None:
         pass
 
-    def split_dataset(self, csv: str, features: list, target: str) -> np.ndarray:
+    def split_dataset(self, csv: str, features: list, target: str) -> np.array:
         df = pd.read_csv(csv)
         train_size = int(len(df) * 0.8)
         test_size = len(df) - train_size
         x_train = df[features][:train_size]
         y_train = df[target][:train_size]
         x_test = df[features][test_size:]
-        y_test = df[target][test_size:]
+        y_test = df[target][test_size:]        
         return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
 class GPTResponse:
@@ -98,7 +99,7 @@ class DataCorpusEncoderManager:
         return
 
     # Index based encoding to map indexes to words within a sentence and return the array containing each response in the array
-    def encode_corpus(self, document_corpus: np.ndarray) -> np.ndarray:
+    def encode_corpus(self, document_corpus: np.array) -> np.array:
         # Empty set to store unique words
         data_corpus: set = set()
 
@@ -137,6 +138,10 @@ class DataCorpusEncoderManager:
                 encoded_sentence = []
                     
                     
-        return np.ndarray(encoded_document_corpus)
-
-
+        # Find the length of the longest sentence
+        max_length = max(len(encoded_sentence) for encoded_sentence in encoded_document_corpus)
+        
+        # Pad the sequences to have the same length
+        padded_encoded_corpus = pad_sequences(encoded_document_corpus, maxlen=max_length, padding='post')
+        
+        return np.array(padded_encoded_corpus)

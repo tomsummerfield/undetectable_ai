@@ -1,6 +1,11 @@
-# DotEnv configuration
-.env
+# Python virtual environment
+myenv/
 
-# exclude data from source control by default
+# Egg-info directory
+undectable_ai.egg-info/
+
+# Data directory
 project_data/
 
+# Compiled Python bytecode
+__pycache__/

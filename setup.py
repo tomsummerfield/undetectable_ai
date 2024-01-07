@@ -7,4 +7,12 @@ setup(
     description='Project to detect AI generated text',
     author='Tom',
     license='MIT',
+    install_requires=[
+        'tensorflow',
+        'pandas',
+        'torch',
+        'torchvision',
+        'numpy',
+        'scikit-learn',
+    ],
 )
